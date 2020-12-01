@@ -19,8 +19,9 @@ if __name__ == '__main__':
     misDevices = BlockDevices()
 
     # sumario de dispositivos
-    print(f"El sistema cuenta con {len(misDevices.ListDevices)} " +
-          "dispositivos de bloque")
+    ndev = len(misDevices.ListDevices)
+    print(f"El sistema cuenta con {ndev} ", end='')
+    print("dispositivos de bloque")
     print(f"de los cuales {len(misDevices.ListDisks)} son discos físicos")
     print(f"y de estos {len(misDevices.find_usb_disks())} son unidades USB")
     print(
