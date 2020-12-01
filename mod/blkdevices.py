@@ -8,7 +8,8 @@
 Clases y colecciones representando los dispositivos de bloques
 para su uso en smbackup.
 
-Uso exclusivo en Linux
+Uso exclusivo en Linux.
+Requiere permisos root.
 
 -------------------------------------------------------------------------------
     Autor: Simón Martínez <simon@cicoss.net>
@@ -23,7 +24,7 @@ import json
 import re
 import time
 
-from lib.device import Device
+from mod.device import Device
 
 
 def dehumanize(str_human):
@@ -55,7 +56,7 @@ def dehumanize(str_human):
     else:
         try:
             return round(float(str_human))
-        except:
+        except ValueError:
             return None
 
     if pot[0] == 'K':
@@ -70,7 +71,7 @@ def dehumanize(str_human):
     try:
         return round(float(numero) * mult)
 
-    except:
+    except ValueError:
         return None
 
 
@@ -470,3 +471,15 @@ class BlockDevices:
             return False
 
         return True
+
+    def mounted_in(self, mountpoint):
+        for dev in self.__myDevices:
+            if dev.mountpoint == mountpoint:
+                return dev
+            for part in dev.partitions:
+                if part.mountpoint == mountpoint:
+                    return part
+                for map in part.mapped:
+                    if map.mountpoint == mountpoint:
+                        return map
+        return None

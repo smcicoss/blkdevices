@@ -12,7 +12,7 @@ Definición de la clase Partition
 
 """
 
-from lib.mapped import Mapped
+from mod.mapped import Mapped
 
 
 class Partition:

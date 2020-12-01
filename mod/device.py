@@ -12,7 +12,7 @@ Definición de la clase Device
 
 """
 
-from lib.partition import Partition
+from mod.partition import Partition
 
 
 class Device:
