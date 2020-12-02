@@ -47,3 +47,12 @@ if __name__ == '__main__':
             f"\t con una capacidad de {pm.fssize} y utilizado en un {pm.fsuse}"
         )
         print(f"\ttiene disponibles {pm.fsavail}")
+
+    print("\n\nVerificar si una unidad está conectada")
+    uuid = input("Introduzca el UUID de la unidad: ")
+    if uuid == "":
+        exit(0)
+    if misDevices.is_connected(uuid):
+        print(f"la unidad {uuid} está conectada")
+    else:
+        print(f"La unidad {uuid} no existe o no está conectada")

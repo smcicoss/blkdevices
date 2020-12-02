@@ -449,6 +449,25 @@ class BlockDevices:
 
         return None
 
+    def is_connected(self, uuid):
+        """
+        is_conected Si esta conectada
+
+        Comprueba si el dispositivo está conectado
+        Util en caso de unidades USB
+        Si es accesible está conectado
+
+        Args:
+            uuid (str): UUID
+
+        Returns:
+            bool: True si está conectado
+        """
+        disp = self.full_search_uuid(uuid)
+        if disp is None:
+            return False
+        return True
+
     def is_mounted(self, uuid):
         """
         is_mounted ¿está montado?
@@ -469,7 +488,6 @@ class BlockDevices:
         attr = disp['en']
         if disp[attr].mountpoint is None:
             return False
-
         return True
 
     def mounted_in(self, mountpoint):
