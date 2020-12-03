@@ -21,7 +21,7 @@ class Partition:
 
     Clase de objetos partición de disco
     """
-    def __init__(self, child):
+    def __init__(self, son):
         """
         __init__ Constructor
 
@@ -29,30 +29,30 @@ class Partition:
         a formato propiedades
 
         Args:
-            child (dictionary): Datos provinientes de la carga json
+            son (dictionary): Datos provinientes de la carga json
         """
-        self.__name = child['name']
-        self.__kname = child['kname']
-        self.__path = child['path']
-        self.__fsavail = child['fsavail']
-        self.__fssize = child['fssize']
-        self.__fstype = child['fstype']
-        self.__fsused = child['fsused']
-        self.__fsuse = child['fsuse%']
-        self.__mountpoint = child['mountpoint']
-        self.__label = child['label']
-        self.__uuid = child['uuid']
-        self.__parttype = child['parttype']
-        self.__partlabel = child['partlabel']
-        self.__partuuid = child['partuuid']
-        self.__size = child['size']
-        self.__mode = child['mode']
-        self.__rota = child['rota']
-        self.__type = child['type']
-        self.__pkname = child['pkname']
+        self.__name = son['name']
+        self.__kname = son['kname']
+        self.__path = son['path']
+        self.__fsavail = son['fsavail']
+        self.__fssize = son['fssize']
+        self.__fstype = son['fstype']
+        self.__fsused = son['fsused']
+        self.__fsuse = son['fsuse%']
+        self.__mountpoint = son['mountpoint']
+        self.__label = son['label']
+        self.__uuid = son['uuid']
+        self.__parttype = son['parttype']
+        self.__partlabel = son['partlabel']
+        self.__partuuid = son['partuuid']
+        self.__size = son['size']
+        self.__mode = son['mode']
+        self.__rota = son['rota']
+        self.__type = son['type']
+        self.__pkname = son['pkname']
         self.__mapped = []
-        if "children" in child:
-            for mapp in child['children']:
+        if "children" in son:
+            for mapp in son['children']:
                 self.__mapped.append(Mapped(mapp))
 
     @property
@@ -299,6 +299,10 @@ class Partition:
         Returns:
             list: mappers
         """
+        return self.__mapped
+
+    @property
+    def sons(self):
         return self.__mapped
 
     def count_mapped(self):

@@ -184,6 +184,24 @@ class BlockDevices:
     def update(self):
         return self.__read_fs(True)
 
+    def get_dev(self, uuid):
+        """
+        get_dev obtinete el dispositivo
+
+        devuelve el path completo al dispositivo
+        util para montado y desmontado
+
+        Args:
+            uuid (str): UUID
+
+        Returns:
+            str: path (/dev/sdxn)
+        """
+        dev = self.full_search_uuid(uuid)
+        if dev is None:
+            return None
+        return dev.path
+
     def find_cdroms(self):
         """
         find_cdroms
@@ -490,7 +508,30 @@ class BlockDevices:
             return False
         return True
 
+    def has_mounted(self, uuid):
+        dev = self.full_search_uuid(uuid)
+        if dev is None:
+            return None
+        mounted = []
+        dev = dev[dev['en']]
+        if dev.mountpoint is not None:
+            mounted.append(dev)
+        if dev.type in ('disk', 'part'):
+            for son in dev.sons:
+                if son.mountpoint is not None:
+                    mounted.append(son)
+
     def mounted_in(self, mountpoint):
+        """
+        mounted_in Dispositivo montado en mountpoint
+
+        Args:
+            mountpoint (str): path
+
+        Returns:
+            objeto: Device, Partition o Mapped
+            None: si falla
+        """
         for dev in self.__myDevices:
             if dev.mountpoint == mountpoint:
                 return dev
@@ -501,3 +542,67 @@ class BlockDevices:
                     if map.mountpoint == mountpoint:
                         return map
         return None
+
+    def mountpoint(self, uuid):
+        """
+        mountpoint Punto de montado
+
+        Devuelve el path completo al punto de montado
+        del dispositivo uuid
+
+        Args:
+            uuid (str): UUID
+
+        Returns:
+            str: path
+            None: si no está montado o no existe la unidad
+        """
+        disp = self.full_search_uuid(uuid)
+        if disp is None:
+            return None
+
+        return disp.mountpoint
+
+    def mount(self, uuid, path):
+        dev = self.full_search_uuid(uuid)
+        if dev is None:
+            return False
+        dev = dev[dev['en']]
+        if dev.fstype in (None, 'crypto_LUKS', 'swap', 'squashfs'):
+            return False
+        if self.is_mounted(uuid):
+            return False
+
+        _path = os.path.abspath(os.path.expanduser(path))
+        if not os.path.isdir(_path):
+            return False
+
+        cmd = f"sudo mount -o exec {dev.path} {_path}"
+        result = os.system(cmd)
+        if result > 0:
+            return False
+        return True
+
+    def umount(self, uuid):
+        dev = self.full_search_uuid(uuid)
+        if dev is None:
+            return False
+        dev = dev[dev['en']]
+        if not self.is_mounted(uuid):
+            return True
+        cmd = f"sudo umount {dev.path} &>/dev/null"
+        result = os.system(cmd)
+        if result > 0:
+            return False
+        return True
+
+    def eject(self, uuid):
+        dev = self.full_search_uuid(uuid)
+        if dev is None:
+            return False
+        dev = dev[dev['en']]
+        if self.is_mounted(uuid):
+            if not self.umount(uuid):
+                return False
+        if dev.type == 'disk':
+            cmd = f"udisksctl power-off -b {dev.path}"

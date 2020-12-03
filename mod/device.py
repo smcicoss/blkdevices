@@ -383,6 +383,10 @@ class Device:
         """
         return self.__partitions
 
+    @property
+    def sons(self):
+        return self.__partitions
+
     def count_partitions(self):
         """
         count_partitions cuenta particiones
