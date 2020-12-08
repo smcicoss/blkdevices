@@ -20,5 +20,6 @@ setup(
         "Operating System :: Linux",
         "License :: OSI Approved :: GNU General Public License (GPL)",
     ],
-    scripts=["test-demo.py"],
+    test_suite="test-demo",
+    scripts=["test-demo/test-blkdevices.py"],
 )

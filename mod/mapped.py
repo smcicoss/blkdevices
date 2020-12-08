@@ -114,3 +114,7 @@ class Mapped:
     @property
     def pkname(self):
         return self.__pkname
+
+    @property
+    def sons(self):
+        return None

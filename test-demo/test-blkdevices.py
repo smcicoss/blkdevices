@@ -56,3 +56,28 @@ if __name__ == '__main__':
         print(f"la unidad {uuid} está conectada")
     else:
         print(f"La unidad {uuid} no existe o no está conectada")
+
+    dev = misDevices.full_search_uuid(uuid)
+    dev = dev[dev['en']]
+    montados = misDevices.has_mounted(uuid)
+    if montados is not None:
+        if len(montados) > 0:
+            print(f"El {dev.type} {dev.path} tiene montados:")
+            for dmontado in montados:
+                print(
+                    f"{dmontado.type} - {dmontado.path} en {dmontado.mountpoint}"
+                )
+        else:
+            print(f"El {dev.type} {dev.path} no tiene nada montado")
+
+    PassportUltra = misDevices.full_search_path("/dev/mapper/Passport-Ultra")
+
+    print(
+        f"\n{PassportUltra.kname} - {PassportUltra.name} {PassportUltra.fsavail}"
+    )
+
+    PassportUltra = misDevices.full_search_name("Passport-Ultra")
+    if PassportUltra is not None:
+        print(
+            f"\n{PassportUltra.kname} - {PassportUltra.name} {PassportUltra.fsavail}"
+        )

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# ·
+
 """
 ===============================================================================
                                blkdevices.py
@@ -467,6 +466,48 @@ class BlockDevices:
 
         return None
 
+    def full_search_kname(self, kname):
+        for dev in self.__myDevices:
+            if dev.kname == kname:
+                return dev
+            if dev.sons is not None:
+                for son in dev.sons:
+                    if son.kname == kname:
+                        return son
+                    if son.sons is not None:
+                        for son2 in son.sons:
+                            if son2.kname == kname:
+                                return son2
+        return None
+
+    def full_search_name(self, name):
+        for dev in self.__myDevices:
+            if dev.name == name:
+                return dev
+            if dev.sons is not None:
+                for son in dev.sons:
+                    if son.name == name:
+                        return son
+                    if son.sons is not None:
+                        for son2 in son.sons:
+                            if son2.name == name:
+                                return son2
+        return None
+
+    def full_search_path(self, path):
+        for dev in self.__myDevices:
+            if dev.path == path:
+                return dev
+            if dev.sons is not None:
+                for son in dev.sons:
+                    if son.path == path:
+                        return son
+                    if son.sons is not None:
+                        for son2 in son.sons:
+                            if son2.path == path:
+                                return son2
+        return None
+
     def is_connected(self, uuid):
         """
         is_conected Si esta conectada
@@ -509,17 +550,42 @@ class BlockDevices:
         return True
 
     def has_mounted(self, uuid):
+        """
+        has_mounted Tiene montados
+
+        comprueba y devuelve todos los sistemas de archivos
+        que tenga montados un dispositivo
+
+        Args:
+            uuid (str): UUID del dispositivo
+
+        Returns:
+            list: lista de devices montados
+            None: Si no tiene
+        """
+
+        # resuelve el dispositivo
         dev = self.full_search_uuid(uuid)
         if dev is None:
             return None
         mounted = []
+        # obtiene el dispositivo (Disk, Patition o Mapped)
         dev = dev[dev['en']]
         if dev.mountpoint is not None:
+            # El propio dispositivo está montado
             mounted.append(dev)
         if dev.type in ('disk', 'part'):
+            # si puede tener hijos
             for son in dev.sons:
                 if son.mountpoint is not None:
+                    # el hijo está montado
                     mounted.append(son)
+                if son.sons is not None:
+                    for son2 in son.sons:
+                        if son2.mountpoint is not None:
+                            mounted.append(son2)
+
+        return mounted
 
     def mounted_in(self, mountpoint):
         """
@@ -604,5 +670,5 @@ class BlockDevices:
         if self.is_mounted(uuid):
             if not self.umount(uuid):
                 return False
-        if dev.type == 'disk':
+        if dev.type == 'disk' and dev.tran == "usb":
             cmd = f"udisksctl power-off -b {dev.path}"
