@@ -1,4 +1,3 @@
-
 """
 ===============================================================================
                                blkdevices.py
@@ -24,54 +23,7 @@ import re
 import time
 
 from mod.device import Device
-
-
-def dehumanize(str_human):
-    """
-    dehumanize deshumaniza
-
-    Convierte Números con formato humanizado en enteros
-
-    Args:
-        str_human (str): cadena con formato humanizado
-                         K,KIB,M,MiB,G,GiB,T,TiB potencias de 2
-                         KB,MB,GB,TB potencias de 10
-
-    Returns:
-        int: valor entero
-    """
-    # TODO: añadir formatos de multiplos internacionales
-    #       KB, MB, GB, TB potencias de 10
-
-    # patron = "^[0-9]+?(\.[0-9]{3})? ?(KiB|K|k)$"
-    patron = " ?(KiB|K|MiB|M|GiB|G|TiB|T){1}$"
-    prog = re.compile(patron)
-    str_human = str_human.replace(',', '.')
-    match = prog.search(str_human)
-    if match is not None:
-        pos = match.regs[0][0]
-        numero = str_human[0:pos].strip()
-        pot = str_human[pos:].strip()
-    else:
-        try:
-            return round(float(str_human))
-        except ValueError:
-            return None
-
-    if pot[0] == 'K':
-        mult = 2**10
-    elif pot[0] == 'M':
-        mult = 2**20
-    elif pot[0] == 'G':
-        mult = 2**30
-    else:
-        mult = 2**40
-
-    try:
-        return round(float(numero) * mult)
-
-    except ValueError:
-        return None
+from utiles.strutil import dehumanize
 
 
 class BlockDevices:
