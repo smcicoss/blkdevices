@@ -19,7 +19,6 @@ import os
 import shutil
 import tempfile
 import json
-import re
 import time
 
 from mod.device import Device
@@ -623,4 +622,5 @@ class BlockDevices:
             if not self.umount(uuid):
                 return False
         if dev.type == 'disk' and dev.tran == "usb":
-            cmd = f"udisksctl power-off -b {dev.path}"
+            pass
+            # cmd = f"udisksctl power-off -b {dev.path}"
