@@ -12,7 +12,11 @@ Definición de la clase Partition
 
 """
 
+import os
+import subprocess
 from mod.mapped import Mapped
+from utiles.strutil import h2
+from utiles.color import Color
 
 
 class PartitionType():
@@ -426,6 +430,58 @@ class Partition:
             for mapp in son['children']:
                 self.__mapped.append(Mapped(mapp))
 
+    def __str__(self):
+        color = Color()
+        if self.label is None:
+            _str = h2(f"Partición {self.path}", 60)
+        else:
+            _str = h2(f"Partición {self.path} [{self.label}]", 60)
+        _str += f"{color.MARRON}name: {color.VERDE}"
+        _str += f"{self.name.rjust(54,'.')}{color.END}\n"
+
+        _str += f"{color.MARRON}kname: {color.VERDE}"
+        _str += f"{self.kname.rjust(53,'.')}{color.END}\n"
+
+        _str += f"{color.MARRON}path: {color.VERDE}"
+        _str += f"{self.path.rjust(54,'.')}{color.END}\n"
+
+        _str += f"{color.MARRON}parttype: {color.VERDE}"
+        _str += f"{self.parttype.rjust(50,'.')}{color.END}\n"
+
+        _parttype = PartitionType()
+        _parttypename = _parttype.find_type(self.parttype)['name']
+        _str += f"{color.VERDE}{_parttypename.rjust(60)}{color.END}\n"
+
+        if self.label is not None:
+            _str += f"{color.MARRON}label: {color.VERDE}"
+            _str += f"{self.label.rjust(53,'.')}{color.END}\n"
+
+        _str += f"{color.MARRON}uuid: {color.VERDE}"
+        _str += f"{self.uuid.rjust(54,'.')}{color.END}\n"
+
+        _str += f"{color.MARRON}fstype: {color.VERDE}"
+        _str += f"{self.fstype.rjust(52,'.')}{color.END}\n"
+
+        if self.fssize is not None:
+            _str += f"{color.MARRON}fssize: {color.VERDE}"
+            _str += f"{self.fssize.rjust(52,'.')}{color.END}\n"
+
+            _usado = f"{self.fsused} - {self.fsuse}"
+            _str += f"{color.MARRON}usado: {color.VERDE}"
+            _str += f"{_usado.rjust(53,'.')}{color.END}\n"
+
+            _str += f"{color.MARRON}libre: {color.VERDE}"
+            _str += f"{self.fsavail.rjust(53,'.')}{color.END}\n"
+
+        _str += f"{color.MARRON}fstype: {color.VERDE}"
+        _str += f"{self.fstype.rjust(52,'.')}{color.END}\n"
+
+        if self.mountpoint is not None:
+            _str += f"{color.MARRON}mountpoint: {color.VERDE}"
+            _str += f"{self.mountpoint.rjust(48,'.')}{color.END}\n"
+
+        return _str
+
     @property
     def name(self):
         """
@@ -706,3 +762,29 @@ class Partition:
                 if map.uuid == mapuuid:
                     return map
         return None
+
+    def mount(self, mountpoint):
+        if self.__mountpoint is not None:
+            # ya está montado
+            return False
+
+        if not os.path.exists(mountpoint):
+            # no existe el punto de montado
+            return False
+
+        _result = subprocess.check_call("sudo mount -o defaults " +
+                                        f"{self.__path} {mountpoint}",
+                                        shell=True)
+        if _result == 0:
+            return True
+        return False
+
+    def umount(self):
+        if self.__mountpoint is None:
+            return False
+        _result = subprocess.check_call(f"sudo umount {self.__path}",
+                                        shell=True)
+
+        if _result == 0:
+            return True
+        return False
