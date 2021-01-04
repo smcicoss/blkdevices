@@ -12,10 +12,11 @@ Definición de la clase Device
 
 """
 
+from mod.blkdevdata import BlkDevData
 from mod.partition import Partition
 
 
-class Device:
+class Device(BlkDevData):
     """
     Dispositivo de Bloques
 
