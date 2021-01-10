@@ -2,3 +2,4 @@ __pycache__/
 blkdevices.egg-info/
 *.code-workspace
 .vscode/
+Datos/

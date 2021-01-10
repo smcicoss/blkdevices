@@ -12,8 +12,24 @@ script para la prueba y demostración de uso de
 blkdevices
 """
 
-from mod.volume import Volume
+import os
+from mod.blockdevices import BlockDevices
 
-if __name__ == '__main__':
-    miVolumen = Volume()
-    pass
+miSistema = BlockDevices()
+
+PassportUltra = miSistema.get_disk_wwn("0x50014ee6052b08c5")
+print(PassportUltra)
+
+for disk in miSistema.Disks:
+    print(f"{disk.path} {disk.wwn.rjust(30,'.')}")
+
+print(PassportUltra.partitions[0])
+PassportUltra.partitions[0].open_volume('PassportUltra')
+
+PassportUltra.partitions[0].volume.mount('/mnt/smbackup/PassportUltra')
+print(PassportUltra.partitions[0].volume)
+
+for filename in os.listdir(PassportUltra.partitions[0].volume.mountpoint):
+    print(filename)
+
+miSistema.eject(PassportUltra.wwn)

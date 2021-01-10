@@ -3,25 +3,22 @@
 
 
 class BlkDevData(object):
-    def __init__(self, data=None):
+    def __init__(self, data):
+
         super().__init__()
 
-        self.__properties = []
-        if data is None or (not isinstance(data, dict)
-                            and not isinstance(data, BlkDevData)):
-            for _prop in self.all_properties:
-                self[_prop] = None
+        self.properties = self.all_properties
+
+        if isinstance(data, dict) or isinstance(data, BlkDevData):
+            _dev = data
         else:
-            for _prop in self.properties:
-                self[_prop] = data[_prop]
+            raise ValueError(
+                "Los datos no corresponden a un dispositivo de bloques")
 
-        self.__modified = False
+        for _prop in self.properties:
+            self[_prop] = _dev[_prop]
 
-        if self.__type is None or \
-                self.__type == "loop" or \
-                self.__type == "rom":
-            self.__properties = self.all_properties
-        elif self.__type == "disk":
+        if self.__type == "disk":
             self.__properties = self.dev_properties
         elif self.__type == "part":
             self.__properties = self.part_properties
@@ -44,7 +41,7 @@ class BlkDevData(object):
         if item == "fstype":
             return self.fstype
         if item == "fsused":
-            return self._fsused
+            return self.fsused
         if item == "fsuse%":
             return self.fsuse
         if item == "mountpoint":
@@ -76,7 +73,7 @@ class BlkDevData(object):
         if item == "model":
             return self.model
         if item == "serial":
-            return self.model
+            return self.serial
         if item == "size":
             return self.size
         if item == "state":
@@ -133,8 +130,6 @@ class BlkDevData(object):
             return self.vendor
         if item == "zoned":
             return self.zoned
-        if item == "children":
-            return self.children
         return None
 
     def __setitem__(self, item, value):
@@ -160,7 +155,7 @@ class BlkDevData(object):
             self.fstype = value
             return
         if item == "fsused":
-            self._fsused = value
+            self.fsused = value
             return
         if item == "fsuse%":
             self.fsuse = value
@@ -208,7 +203,7 @@ class BlkDevData(object):
             self.model = value
             return
         if item == "serial":
-            self.model = value
+            self.serial = value
             return
         if item == "size":
             self.size = value
@@ -294,8 +289,6 @@ class BlkDevData(object):
         if item == "zoned":
             self.zoned = value
             return
-        if item == "children":
-            self.children = value
 
     def __len__(self):
         lenOfData = 0
@@ -314,8 +307,7 @@ class BlkDevData(object):
             "group", "mode", "alignment", "min-io", "opt-io", "phy-sec",
             "log-sec", "rota", "sched", "rq-size", "type", "disc-aln",
             "disc-gran", "disc-max", "disc-zero", "wsame", "wwn", "rand",
-            "pkname", "hctl", "tran", "subsystems", "rev", "vendor", "zoned",
-            "children"
+            "pkname", "hctl", "tran", "subsystems", "rev", "vendor", "zoned"
         ]
 
     @property
@@ -327,7 +319,7 @@ class BlkDevData(object):
             "alignment", "min-io", "opt-io", "phy-sec", "log-sec", "rota",
             "sched", "rq-size", "type", "disc-aln", "disc-gran", "disc-max",
             "disc-zero", "wsame", "wwn", "rand", "hctl", "tran", "subsystems",
-            "rev", "vendor", "zoned", "children"
+            "rev", "vendor", "zoned"
         ]
 
     @property
@@ -338,8 +330,8 @@ class BlkDevData(object):
             "partuuid", "ra", "ro", "rm", "hotplug", "model", "serial", "size",
             "mode", "alignment", "min-io", "opt-io", "phy-sec", "log-sec",
             "rota", "sched", "rq-size", "type", "disc-aln", "disc-gran",
-            "disc-max", "disc-zero", "wsame", "rand", "pkname", "subsystems"
-            "zoned", "children"
+            "disc-max", "disc-zero", "wsame", "rand", "pkname", "subsystems",
+            "zoned"
         ]
 
     @property
@@ -359,12 +351,15 @@ class BlkDevData(object):
 
     @properties.setter
     def properties(self, props):
-        if type(props) != type(list):
+        if not isinstance(props, list):
             return
         for prop in props:
             if prop not in self.all_properties:
                 return
         self.__properties = props
+
+    def keys(self):
+        return self.__properties
 
     # -----------------------------------------------
 
@@ -576,285 +571,214 @@ class BlkDevData(object):
     def zoned(self):
         return self.__zoned
 
-    @property
-    def children(self):
-        return self.__children
-
     # ---------------------------------------
 
     @name.setter
     def name(self, value):
         self.__name = value
-        self.__modified = True
 
     @kname.setter
     def kname(self, value):
         self.__kname = value
-        self.__modified = True
 
     @path.setter
     def path(self, value):
         self.__path = value
-        self.__modified = True
 
     @maj_min.setter
     def maj_min(self, value):
         self.__maj_min = value
-        self.__modified = True
 
     @fsavail.setter
     def fsavail(self, value):
         self.__fsavail = value
-        self.__modified = True
 
     @fssize.setter
     def fssize(self, value):
         self.__fssize = value
-        self.__modified = True
 
     @fstype.setter
     def fstype(self, value):
         self.__fstype = value
-        self.__modified = True
 
     @fsused.setter
     def fsused(self, value):
         self.__fsused = value
-        self.__modified = True
 
     @fsuse.setter
     def fsuse(self, value):
         self.__fsuse = value
-        self.__modified = True
 
     @mountpoint.setter
     def mountpoint(self, value):
         self.__mountpoint = value
-        self.__modified = True
 
     @label.setter
     def label(self, value):
         self.__label = value
-        self.__modified = True
 
     @uuid.setter
     def uuid(self, value):
         self.__uuid = value
-        self.__modified = True
 
     @ptuuid.setter
     def ptuuid(self, value):
         self.__ptuuid = value
-        self.__modified = True
 
     @pttype.setter
     def pttype(self, value):
         self.__pttype = value
-        self.__modified = True
 
     @parttype.setter
     def parttype(self, value):
         self.__parttype = value
-        self.__modified = True
 
     @partlabel.setter
     def partlabel(self, value):
         self.__partlabel = value
-        self.__modified = True
 
     @partuuid.setter
     def partuuid(self, value):
         self.__partuuid = value
-        self.__modified = True
 
     @partflags.setter
     def partflags(self, value):
         self.__partflags = value
-        self.__modified = True
 
     @ra.setter
     def ra(self, value):
         self.__ra = value
-        self.__modified = True
 
     @ro.setter
     def ro(self, value):
         self.__ro = value
-        self.__modified = True
 
     @rm.setter
     def rm(self, value):
         self.__rm = value
-        self.__modified = True
 
     @hotplug.setter
     def hotplug(self, value):
         self.__hotplug = value
-        self.__modified = True
 
     @model.setter
     def model(self, value):
         self.__model = value
-        self.__modified = True
 
     @serial.setter
     def serial(self, value):
         self.__serial = value
-        self.__modified = True
 
     @size.setter
     def size(self, value):
         self.__size = value
-        self.__modified = True
 
     @state.setter
     def state(self, value):
         self.__state = value
-        self.__modified = True
 
     @owner.setter
     def owner(self, value):
         self.__owner = value
-        self.__modified = True
 
     @group.setter
     def group(self, value):
         self.__group = value
-        self.__modified = True
 
     @mode.setter
     def mode(self, value):
         self.__mode = value
-        self.__modified = True
 
     @alignment.setter
     def alignment(self, value):
         self.__alignment = value
-        self.__modified = True
 
     @min_io.setter
     def min_io(self, value):
         self.__min_io = value
-        self.__modified = True
 
     @opt_io.setter
     def opt_io(self, value):
         self.__opt_io = value
-        self.__modified = True
 
     @phy_sec.setter
     def phy_sec(self, value):
         self.__phy_sec = value
-        self.__modified = True
 
     @log_sec.setter
     def log_sec(self, value):
         self.__log_sec = value
-        self.__modified = True
 
     @rota.setter
     def rota(self, value):
         self.__rota = value
-        self.__modified = True
 
     @sched.setter
     def sched(self, value):
         self.__sched = value
-        self.__modified = True
 
     @rq_size.setter
     def rq_size(self, value):
         self.__rq_size = value
-        self.__modified = True
 
     @type.setter
     def type(self, value):
         self.__type = value
-        self.__modified = True
 
     @disc_aln.setter
     def disc_aln(self, value):
         self.__disc_aln = value
-        self.__modified = True
 
     @disc_gran.setter
     def disc_gran(self, value):
         self.__disc_gran = value
-        self.__modified = True
 
     @disc_max.setter
     def disc_max(self, value):
         self.__disc_max = value
-        self.__modified = True
 
     @disc_zero.setter
     def disc_zero(self, value):
         self.__disc_zero = value
-        self.__modified = True
 
     @wsame.setter
     def wsame(self, value):
         self.__wsame = value
-        self.__modified = True
 
     @wwn.setter
     def wwn(self, value):
         self.__wwn = value
-        self.__modified = True
 
     @rand.setter
     def rand(self, value):
         self.__rand = value
-        self.__modified = True
 
     @pkname.setter
     def pkname(self, value):
         self.__pkname = value
-        self.__modified = True
 
     @hctl.setter
     def hctl(self, value):
         self.__hctl = value
-        self.__modified = True
 
     @tran.setter
     def tran(self, value):
         self.__tran = value
-        self.__modified = True
 
     @subsystems.setter
     def subsystems(self, value):
         self.__subsystems = value
-        self.__modified = True
 
     @rev.setter
     def rev(self, value):
         self.__rev = value
-        self.__modified = True
 
     @vendor.setter
     def vendor(self, value):
         self.__vendor = value
-        self.__modified = True
 
     @zoned.setter
     def zoned(self, value):
         self.__zoned = value
-        self.__modified = True
-
-    @children.setter
-    def children(self, value):
-        self.__children = value
-        self.__modified = True
-        # TODO: Controlar el dato de entrada
 
     # -----------------------------------------------
-    @property
-    def modified(self):
-        return self.__modified
-
-    @property
-    def completed(self):
-        if len(self) == len(self.__properties):
-            return True
-        return False
